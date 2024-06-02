@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 /** Define the dash: [dash length, gap size, dash size, gap size, ...] */
-export declare type Dashes = number[];
+export type Dashes = number[];
 export interface DashLineOptions {
     dash?: Dashes;
     width?: number;
@@ -9,8 +9,8 @@ export interface DashLineOptions {
     scale?: number;
     useTexture?: boolean;
     useDots?: boolean;
-    cap?: PIXI.LINE_CAP;
-    join?: PIXI.LINE_JOIN;
+    cap?: PIXI.LineCap;
+    join?: PIXI.LineJoin;
     alignment?: number;
 }
 export declare class DashLine {

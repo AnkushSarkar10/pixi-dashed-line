@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc lib/index.ts --outDir dist --skipLibCheck --module commonjs --moduleResolution node --declaration --sourceMap",
-    "build-demo": "esbuild demo/index.ts --outfile=docs/index.js --bundle",
+    "build-demo": "esbuild demo/index.ts --outfile=docs/index.js --bundle --format=esm",
     "prepublishOnly": "npm run build && npm run build-demo"
   },
   "files": [
@@ -33,13 +33,10 @@
   ],
   "author": "David Figatner <david@yopeyopey.com> (https://yopeyopey.com)",
   "license": "MIT",
-  "peerDependencies": {
-    "pixi.js": "^6.2.2"
-  },
   "devDependencies": {
     "esbuild": "^0.12.15",
-    "pixi-viewport": "^4.31.0",
-    "pixi.js": "^6.3.0",
+    "pixi-viewport": "^5.0.3",
+    "pixi.js": "^8.1.5",
     "typescript": "^4.3.5"
   }
 }

@@ -1,8 +1,8 @@
 import * as PIXI from 'pixi.js'
-
+ 
 /** Define the dash: [dash length, gap size, dash size, gap size, ...] */
 export type Dashes = number[]
-
+ 
 export interface DashLineOptions {
     dash?: Dashes,
     width?: number
@@ -11,11 +11,11 @@ export interface DashLineOptions {
     scale?: number
     useTexture?: boolean
     useDots?: boolean
-    cap?: PIXI.LINE_CAP
-    join?: PIXI.LINE_JOIN
+    cap?: PIXI.LineCap
+    join?: PIXI.LineJoin
     alignment?: number
 }
-
+ 
 const dashLineOptionsDefault: Partial<DashLineOptions> = {
     dash: [10, 5],
     width: 1,
@@ -25,33 +25,33 @@ const dashLineOptionsDefault: Partial<DashLineOptions> = {
     useTexture: false,
     alignment: 0.5,
 }
-
+ 
 export class DashLine {
     graphics: PIXI.Graphics
-
+ 
     /** current length of the line */
     lineLength: number
-
+ 
     /** cursor location */
     cursor = new PIXI.Point()
-
+ 
     /** desired scale of line */
     scale = 1
-
+ 
     // sanity check to ensure the lineStyle is still in use
     private activeTexture: PIXI.Texture
-
+ 
     private start: PIXI.Point
-
+ 
     private dashSize: number
     private dash: number[]
-
+ 
     private useTexture: boolean
     private options: DashLineOptions;
-
+ 
     // cache of PIXI.Textures for dashed lines
     static dashTextureCache: Record<string, PIXI.Texture> = {}
-
+ 
     /**
      * Create a DashLine
      * @param graphics
@@ -74,13 +74,13 @@ export class DashLine {
         this.options = options;
         this.setLineStyle();
     }
-
+ 
     /** resets line style to enable dashed line (useful if lineStyle was changed on graphics element) */
     setLineStyle() {
         const options = this.options
         if (this.useTexture) {
             const texture = DashLine.getTexture(options, this.dashSize)
-            this.graphics.lineTextureStyle({
+            this.graphics.stroke({
                 width: options.width * options.scale,
                 color: options.color,
                 alpha: options.alpha,
@@ -89,7 +89,7 @@ export class DashLine {
             })
             this.activeTexture = texture
         } else {
-            this.graphics.lineStyle({
+            this.graphics.stroke({
                 width: options.width * options.scale,
                 color: options.color,
                 alpha: options.alpha,
@@ -97,15 +97,15 @@ export class DashLine {
                 join: options.join,
                 alignment: options.alignment,
             })
-
+ 
         }
         this.scale = options.scale
     }
-
+ 
     private static distance(x1: number, y1: number, x2: number, y2: number): number {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
     }
-
+ 
     moveTo(x: number, y: number): this {
         this.lineLength = 0
         this.cursor.set(x, y)
@@ -113,7 +113,7 @@ export class DashLine {
         this.graphics.moveTo(this.cursor.x, this.cursor.y)
         return this
     }
-
+ 
     lineTo(x: number, y: number, closePath?: boolean): this {
         if (typeof this.lineLength === undefined) {
             this.moveTo(0, 0)
@@ -136,7 +136,7 @@ export class DashLine {
             const sin = Math.sin(angle)
             let x0 = this.cursor.x
             let y0 = this.cursor.y
-
+ 
             // find the first part of the dash for this line
             const place = this.lineLength % (this.dashSize * this.scale)
             let dashIndex: number = 0, dashStart: number = 0
@@ -151,7 +151,7 @@ export class DashLine {
                     dashX += dashSize
                 }
             }
-
+ 
             let remaining = length
             // let count = 0
             while (remaining > 0) { // && count++ < 1000) {
@@ -169,7 +169,7 @@ export class DashLine {
                         break
                     }
                 }
-
+ 
                 x0 += cos * dist
                 y0 += sin * dist
                 if (dashIndex % 2) {
@@ -178,7 +178,7 @@ export class DashLine {
                     this.graphics.lineTo(x0, y0)
                 }
                 remaining -= dist
-
+ 
                 dashIndex++
                 dashIndex = dashIndex === this.dash.length ? 0 : dashIndex
                 dashStart = 0
@@ -189,11 +189,11 @@ export class DashLine {
         this.cursor.set(x, y)
         return this
     }
-
+ 
     closePath() {
         this.lineTo(this.start.x, this.start.y, true)
     }
-
+ 
     drawCircle(x: number, y: number, radius: number, points = 80, matrix?: PIXI.Matrix): this {
         const interval = Math.PI * 2 / points
         let angle = 0, first: PIXI.Point
@@ -213,7 +213,7 @@ export class DashLine {
         }
         return this
     }
-
+ 
     drawEllipse(x: number, y: number, radiusX: number, radiusY: number, points = 80, matrix?: PIXI.Matrix): this {
         const interval = Math.PI * 2 / points
         let first: { x: number, y: number }
@@ -238,7 +238,7 @@ export class DashLine {
         this.lineTo(first.x, first.y, true)
         return this
     }
-
+ 
     drawPolygon(points: PIXI.Point[] | number[], matrix?: PIXI.Matrix): this {
         const p = new PIXI.Point()
         if (typeof points[0] === 'number') {
@@ -280,31 +280,31 @@ export class DashLine {
         }
         return this
     }
-
+ 
     drawRect(x: number, y: number, width: number, height: number, matrix?: PIXI.Matrix): this {
         if (matrix) {
             const p = new PIXI.Point()
-
+ 
             // moveTo(x, y)
             p.set(x, y)
             matrix.apply(p, p)
             this.moveTo(p.x, p.y)
-
+ 
             // lineTo(x + width, y)
             p.set(x + width, y)
             matrix.apply(p, p)
             this.lineTo(p.x, p.y)
-
+ 
             // lineTo(x + width, y + height)
             p.set(x + width, y + height)
             matrix.apply(p, p)
             this.lineTo(p.x, p.y)
-
+ 
             // lineto(x, y + height)
             p.set(x, y + height)
             matrix.apply(p, p)
             this.lineTo(p.x, p.y)
-
+ 
             // lineTo(x, y, true)
             p.set(x, y)
             matrix.apply(p, p)
@@ -318,10 +318,10 @@ export class DashLine {
         }
         return this
     }
-
+ 
     // adjust the matrix for the dashed texture
     private adjustLineStyle(angle: number) {
-        const lineStyle = this.graphics.line
+        const lineStyle = this.graphics.strokeStyle
         lineStyle.matrix = new PIXI.Matrix()
         if (angle) {
             lineStyle.matrix.rotate(angle)
@@ -329,9 +329,9 @@ export class DashLine {
         if (this.scale !== 1) lineStyle.matrix.scale(this.scale, this.scale)
         const textureStart = -this.lineLength
         lineStyle.matrix.translate(this.cursor.x + textureStart * Math.cos(angle), this.cursor.y + textureStart * Math.sin(angle))
-        this.graphics.lineStyle(lineStyle)
+        this.graphics.stroke(lineStyle)
     }
-
+ 
     // creates or uses cached texture
     private static getTexture(options: DashLineOptions, dashSize: number): PIXI.Texture {
         const key = options.dash.toString()
@@ -362,7 +362,7 @@ export class DashLine {
         }
         context.stroke()
         const texture = DashLine.dashTextureCache[key] = PIXI.Texture.from(canvas)
-        texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST
+        texture.source.scaleMode = "nearest"
         return texture
     }
 }

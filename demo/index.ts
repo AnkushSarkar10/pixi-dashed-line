@@ -10,20 +10,22 @@ function checkbox() {
     return document.querySelector('#use-texture') as HTMLInputElement
 }
 
-function setup() {
+async function setup() {
     const canvas = document.querySelector('canvas')
-    const application = new PIXI.Application({
+    const application = new PIXI.Application()
+    await application.init({
         view: canvas,
         width: window.innerWidth,
         height: window.innerHeight,
         antialias: true,
         backgroundAlpha: 0,
-    })
+    });
     viewport = application.stage.addChild(new Viewport({
         screenWidth: window.innerWidth,
         screenHeight: window.innerHeight,
         passiveWheel: false,
         stopPropagation: true,
+        events: application.renderer.events 
     }))
     viewport.pinch().wheel().decelerate().drag()
     g = viewport.addChild(new PIXI.Graphics())
@@ -49,7 +51,7 @@ function drawScalingRectangle() {
     })
     dash.drawRect(100, 100, x2 - 100, y2 - 100)
 
-    const text = g.addChild(new PIXI.Text('This rectangle\'s outline size remains constant when zooming', { fill: 'black', fontSize: '15px' }))
+    const text = g.addChild(new PIXI.Text('This rectangle\'s outline size remains constant when zooming', { fill: 'black', fontSize: 15 }))
     text.position.set(x2 - text.width, 100 - text.height - 5)
 }
 
@@ -59,12 +61,12 @@ function drawJoinCapRectangle() {
         width: 3,
         color: 0xaa00aa,
         useTexture,
-        cap: PIXI.LINE_CAP.ROUND,
-        join: PIXI.LINE_JOIN.ROUND,
+        cap: "round",
+        join: "round"
     })
     dash.drawRect(150, 150, x2 - 200, y2 - 200)
 
-    const text = g.addChild(new PIXI.Text('Using cap and joins (only works when useTexture: false)', { fill: 'black', fontSize: '15px' }))
+    const text = g.addChild(new PIXI.Text('Using cap and joins (only works when useTexture: false)', { fill: 'black', fontSize: 15 }))
     text.position.set(x2 - 50 - text.width, 150 - text.height - 5)
 }
 
@@ -140,6 +142,10 @@ function keyboard() {
     })
 }
 
-setup()
-draw()
-keyboard()
+async function initialize() {
+    await setup()
+    draw()
+    keyboard()
+}
+
+initialize()
