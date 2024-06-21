@@ -30084,12 +30084,15 @@ var _DashLine = class {
     this.dashSize = this.dash.reduce((a2, b2) => a2 + b2);
     this.useTexture = options.useTexture;
     this.options = options;
-    this.setLineStyle();
+    this.setStrokeStyle();
   }
   stroke() {
     this.graphics.stroke();
   }
-  setLineStyle() {
+  beginPath() {
+    this.graphics.beginPath();
+  }
+  setStrokeStyle() {
     const options = this.options;
     if (this.useTexture) {
       const texture = _DashLine.getTexture(options, this.dashSize);
@@ -30397,7 +30400,7 @@ function drawScalingRectangle() {
     alignment: 1
   });
   dash.rect(100, 100, x22 - 100, y2 - 100);
-  const text = g2.addChild(new Text("This rectangle's outline size remains constant when zooming", { fill: "black", fontSize: 15 }));
+  const text = g2.addChild(new Text({ text: "This rectangle's outline size remains constant when zooming", style: { fill: "black", fontSize: 15 } }));
   text.position.set(x22 - text.width, 100 - text.height - 5);
   dash.stroke();
 }
@@ -30411,7 +30414,7 @@ function drawJoinCapRectangle() {
     join: "round"
   });
   dash.rect(150, 150, x22 - 200, y2 - 200);
-  const text = g2.addChild(new Text("Using cap and joins (only works when useTexture: false)", { fill: "black", fontSize: 15 }));
+  const text = g2.addChild(new Text({ text: "Using cap and joins (only works when useTexture: false)", style: { fill: "black", fontSize: 15 } }));
   text.position.set(x22 - 50 - text.width, 150 - text.height - 5);
   dash.stroke();
 }
