@@ -21,8 +21,8 @@ DashLine.DashLineOptions = {
     width?=1 - width of the dashed line
     color?=0xffffff - color of the dashed line
     alpha?=1 - alpha of the dashed line
-    options.cap? - add a PIXI.LINE_CAP style to dashed lines (only works for useTexture: false)
-    options.join? - add a PIXI.LINE_JOIN style to the dashed lines (only works for useTexture: false)
+    options.cap? - add a line cap style to dashed lines (only works for useTexture: false)
+    options.join? - add a line join style to the dashed lines (only works for useTexture: false)
     options.alignment? - change alignment of lines drawn (0.5 = middle, 1 = outer, 0 = inner)
 }
 ```
@@ -32,20 +32,20 @@ Moves cursor to location
 #### lineTo(x: number, y: number, closePath?: boolean)
 Draws a dashed line. If closePath = true, then lineTo will leave a proper gap if its destination is the first point (ie, if this line closes the shape)
 
-#### drawCircle(x: number, y: number, radius: number, points=80, matrix?: PIXI.Matrix)
-where x,y is the center of circle, and points are the number of points used to draw the circle; matrix is applied before the draw (this adds a shape-specific transform to pixi's DisplayObject transforms)
+#### circle(x: number, y: number, radius: number, points=80, matrix?: PIXI.Matrix)
+where x,y is the center of circle, and points are the number of points used to draw the circle; matrix is applied before the draw (this adds a shape-specific transform to pixi's Container transforms)
 
-#### drawEllipse(x: number, y: number, radiusX: number, radiusY: number, points=80, matrix?: PIXI.Matrix)
-where x,y is the center of ellipse, and points are the number of points used to draw the ellipse; matrix is applied before the draw (this adds a shape-specific transform to pixi's DisplayObject transforms)
+#### ellipse(x: number, y: number, radiusX: number, radiusY: number, points=80, matrix?: PIXI.Matrix)
+where x,y is the center of ellipse, and points are the number of points used to draw the ellipse; matrix is applied before the draw (this adds a shape-specific transform to pixi's Container transforms)
 
-#### drawRect(x: number, y: number, width: number, height: number, matrix?: PIXI.Matrix)
-draws a dashed rectangle; matrix is applied before the draw (this adds a shape-specific transform to pixi's DisplayObject transforms)
+#### rect(x: number, y: number, width: number, height: number, matrix?: PIXI.Matrix)
+draws a dashed rectangle; matrix is applied before the draw (this adds a shape-specific transform to pixi's Container transforms)
 
-#### drawPolygon(PIXI.Point[] | number[], matrix?: PIXI.Matrix)
-draws a dashed polygon; matrix is applied before the draw (this adds a shape-specific transform to pixi's DisplayObject transforms)
+#### polygon(PIXI.Point[] | number[], matrix?: PIXI.Matrix)
+draws a dashed polygon; matrix is applied before the draw (this adds a shape-specific transform to pixi's Container transforms)
 
-#### setLineStyle()
-changes line style to the proper dashed line style -- this is useful if the graphics element's lineStyle was changed
+#### setStrokeStyle()
+changes stroke style to the proper dashed stroke style -- this is useful if the graphics element's stroketyle was changed
 
 ## Simple Example
 
@@ -67,6 +67,7 @@ dash.moveTo(0, 0)
     .lineTo(0, 100)
     .lineTo(0, 0)
 
+dash.stroke() // Have to call .stroke() like you on would on a graphics object
 ```
 ## When to use options.useTexture = true
 
@@ -75,7 +76,7 @@ For most use-cases, the lineTo/moveTo (`options.useTexture = false`) is better b
 The texture-based approach (`options.useTexture = true`) is useful when the geometry is very large or very small as PIXI.Graphics does not handle those cases well (see https://www.html5gamedevs.com/topic/24876-weird-lines-when-using-extreme-coordinate-values/). You'll know you need this if zooming in and out on the dashed line causes out of memory errors :)
 
 ### Technical Notes on options.useTexture = true
-`options.useTexture=true` does not use pixi.js's line joins and caps for connecting lines (see https://mattdesl.svbtle.com/drawing-lines-is-hard): instead it uses `Graphics.lineTextureStyle` to supply a texture to draw the dashed lines. The texture needs a custom matrix to properly rotate the dash based on the angle of the next line (and to translate the texture so it starts properly (see https://www.html5gamedevs.com/topic/45698-begintexturefill/)). Without the matrix, the dash's length will change as the line's angle changes.
+`options.useTexture=true` does not use pixi.js's line joins and caps for connecting lines (see https://mattdesl.svbtle.com/drawing-lines-is-hard): instead it uses `Graphics.StrokeStyle` to supply a texture to draw the dashed lines. The texture needs a custom matrix to properly rotate the dash based on the angle of the next line (and to translate the texture so it starts properly (see https://www.html5gamedevs.com/topic/45698-begintexturefill/)). Without the matrix, the dash's length will change as the line's angle changes.
 
 Regrettably, pixi.js does not provide a mechanism to change the matrix of a texture without breaking the current line with a moveTo command. (This was my key insight that finally got this working. I banged my head many hours trying to figure out why the texture did not rotate properly. The answer was that you have to moveTo before changing the matrix.)
 

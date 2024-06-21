@@ -72,15 +72,23 @@ export class DashLine {
         this.dashSize = this.dash.reduce((a, b) => a + b)
         this.useTexture = options.useTexture
         this.options = options;
-        this.setLineStyle();
+        this.setStrokeStyle();
+    }
+
+    stroke() {
+        this.graphics.stroke();
+    }
+
+    beginPath() {
+        this.graphics.beginPath();
     }
  
     /** resets line style to enable dashed line (useful if lineStyle was changed on graphics element) */
-    setLineStyle() {
+    setStrokeStyle() {
         const options = this.options
         if (this.useTexture) {
             const texture = DashLine.getTexture(options, this.dashSize)
-            this.graphics.stroke({
+            this.graphics.setStrokeStyle({
                 width: options.width * options.scale,
                 color: options.color,
                 alpha: options.alpha,
@@ -89,7 +97,7 @@ export class DashLine {
             })
             this.activeTexture = texture
         } else {
-            this.graphics.stroke({
+            this.graphics.setStrokeStyle({
                 width: options.width * options.scale,
                 color: options.color,
                 alpha: options.alpha,
@@ -194,7 +202,7 @@ export class DashLine {
         this.lineTo(this.start.x, this.start.y, true)
     }
  
-    drawCircle(x: number, y: number, radius: number, points = 80, matrix?: PIXI.Matrix): this {
+    circle(x: number, y: number, radius: number, points = 80, matrix?: PIXI.Matrix): this {
         const interval = Math.PI * 2 / points
         let angle = 0, first: PIXI.Point
         if (matrix) {
@@ -214,7 +222,7 @@ export class DashLine {
         return this
     }
  
-    drawEllipse(x: number, y: number, radiusX: number, radiusY: number, points = 80, matrix?: PIXI.Matrix): this {
+    ellipse(x: number, y: number, radiusX: number, radiusY: number, points = 80, matrix?: PIXI.Matrix): this {
         const interval = Math.PI * 2 / points
         let first: { x: number, y: number }
         const point = new PIXI.Point()
@@ -239,7 +247,7 @@ export class DashLine {
         return this
     }
  
-    drawPolygon(points: PIXI.Point[] | number[], matrix?: PIXI.Matrix): this {
+    polygon(points: PIXI.Point[] | number[], matrix?: PIXI.Matrix): this {
         const p = new PIXI.Point()
         if (typeof points[0] === 'number') {
             if (matrix) {
@@ -281,7 +289,7 @@ export class DashLine {
         return this
     }
  
-    drawRect(x: number, y: number, width: number, height: number, matrix?: PIXI.Matrix): this {
+    rect(x: number, y: number, width: number, height: number, matrix?: PIXI.Matrix): this {
         if (matrix) {
             const p = new PIXI.Point()
  
@@ -329,7 +337,7 @@ export class DashLine {
         if (this.scale !== 1) lineStyle.matrix.scale(this.scale, this.scale)
         const textureStart = -this.lineLength
         lineStyle.matrix.translate(this.cursor.x + textureStart * Math.cos(angle), this.cursor.y + textureStart * Math.sin(angle))
-        this.graphics.stroke(lineStyle)
+        this.graphics.setStrokeStyle(lineStyle)
     }
  
     // creates or uses cached texture

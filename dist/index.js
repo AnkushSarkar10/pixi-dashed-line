@@ -10,7 +10,7 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 exports.DashLine = void 0;
 var PIXI = require("pixi.js");
 var dashLineOptionsDefault = {
@@ -20,7 +20,7 @@ var dashLineOptionsDefault = {
     alpha: 1,
     scale: 1,
     useTexture: false,
-    alignment: 0.5,
+    alignment: 0.5
 };
 var DashLine = /** @class */ (function () {
     /**
@@ -55,23 +55,23 @@ var DashLine = /** @class */ (function () {
         var options = this.options;
         if (this.useTexture) {
             var texture = DashLine.getTexture(options, this.dashSize);
-            this.graphics.stroke({
+            this.graphics.setStrokeStyle({
                 width: options.width * options.scale,
                 color: options.color,
                 alpha: options.alpha,
                 texture: texture,
-                alignment: options.alignment,
+                alignment: options.alignment
             });
             this.activeTexture = texture;
         }
         else {
-            this.graphics.stroke({
+            this.graphics.setStrokeStyle({
                 width: options.width * options.scale,
                 color: options.color,
                 alpha: options.alpha,
                 cap: options.cap,
                 join: options.join,
-                alignment: options.alignment,
+                alignment: options.alignment
             });
         }
         this.scale = options.scale;
@@ -299,7 +299,7 @@ var DashLine = /** @class */ (function () {
             lineStyle.matrix.scale(this.scale, this.scale);
         var textureStart = -this.lineLength;
         lineStyle.matrix.translate(this.cursor.x + textureStart * Math.cos(angle), this.cursor.y + textureStart * Math.sin(angle));
-        this.graphics.stroke(lineStyle);
+        this.graphics.setStrokeStyle(lineStyle);
     };
     // creates or uses cached texture
     DashLine.getTexture = function (options, dashSize) {
